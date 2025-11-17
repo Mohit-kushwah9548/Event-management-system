@@ -1,0 +1,26 @@
+[
+  {
+    "id": "EVT001",
+    "name": "TechConf 2025",
+    "date": "2025-03-15",
+    "location": "New Delhi",
+    "category": "Technology",
+    "description": "Annual technology conference featuring industry leaders and innovation showcase.",
+    "price": 2500,
+    "image_url": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop",
+    "total_tickets": 500,
+    "sold_tickets": 125
+  },
+  {
+    "id": "EVT002",
+    "name": "Mumbai Music Festival",
+    "date": "2025-04-20",
+    "location": "Mumbai",
+    "category": "Music",
+    "description": "Three-day music festival with performances from national and international artists.",
+    "price": 1500,
+    "image_url": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=300&fit=crop",
+    "total_tickets": 1000,
+    "sold_tickets": 450
+  }
+]

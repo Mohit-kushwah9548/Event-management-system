@@ -1,0 +1,16 @@
+[
+  {
+    "id": "USR001",
+    "email": "client@glau.com",
+    "password": "client123",
+    "name": "Rajesh Kumar",
+    "role": "client"
+  },
+  {
+    "id": "ADM001",
+    "email": "admin@glau.com",
+    "password": "admin123",
+    "name": "Admin User",
+    "role": "admin"
+  }
+]

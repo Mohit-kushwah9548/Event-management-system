@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: glau-event-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: glau_admin
+      MONGO_INITDB_ROOT_PASSWORD: MySecurePass123
+      MONGO_INITDB_DATABASE: glau-event
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - glau-network
+    healthcheck:
+      test: mongosh --eval "db.adminCommand('ping')" --username glau_admin --password MySecurePass123 --authenticationDatabase admin || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: glau-event-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      MONGODB_URI: mongodb://glau_admin:MySecurePass123@mongodb:27017/glau-event?authSource=admin
+      JWT_SECRET: your_super_secret_jwt_key_at_least_32_characters_long
+      JWT_EXPIRE: 7d
+      JWT_REFRESH_SECRET: your_refresh_token_secret_also_32_characters
+      JWT_REFRESH_EXPIRE: 30d
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - glau-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+networks:
+  glau-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+  mongodb_config:

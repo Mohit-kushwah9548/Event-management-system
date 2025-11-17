@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLAU EVENT - Event Management Platform</title>
+    
+    <!-- PDF Generation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- QR Code Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        /* ==================== CSS VARIABLES FOR THEMING ==================== */
+        :root {
+            /* Light Theme Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --bg-tertiary: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-color: #e5e7eb;
+            --card-bg: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-hover: rgba(0, 0, 0, 0.15);
+            --primary-color: #0891b2;
+            --primary-hover: #0e7490;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme Colors */
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --border-color: #334155;
+            --card-bg: #1e293b;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --shadow-hover: rgba(0, 0, 0, 0.4);
+            --primary-color: #06b6d4;
+            --primary-hover: #0891b2;
+        }
+
+        /* ==================== GLOBAL STYLES ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* ==================== NAVIGATION BAR ==================== */
+        .navbar {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background-color: var(--bg-secondary);
+            color: var(--primary-color);
+        }
+
+        /* ==================== THEME TOGGLE BUTTON ==================== */
+        .theme-toggle-btn {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.1);
+            background: var(--bg-tertiary);
+        }
+
+        /* ==================== BUTTONS ==================== */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .btn-danger {
+            background-color: var(--error-color);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        /* ==================== FORMS ==================== */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+        }
+
+        /* ==================== CARDS ==================== */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px var(--shadow-hover);
+        }
+
+        /* ==================== EVENT CARDS ==================== */
+        .event-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .event-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px var(--shadow-hover);
+        }
+
+        .event-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .event-card:hover .event-image {
+            transform: scale(1.05);
+        }
+
+        .event-details {
+            padding: 1.5rem;
+        }
+
+        .event-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .event-category {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ==================== MODAL ==================== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        /* ==================== GRID LAYOUTS ==================== */
+        .grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        }
+
+        /* ==================== CONTAINER ==================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* ==================== AUTHENTICATION PAGES ==================== */
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        }
+
+        .auth-card {
+            background-color: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .auth-card h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        /* ==================== DASHBOARD ==================== */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 1rem 2rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .main-content {
+            padding: 2rem;
+            background-color: var(--bg-secondary);
+        }
+
+        /* ==================== STATS CARDS ==================== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* ==================== TABLE ==================== */
+        .table-container {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: var(--bg-secondary);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        tbody tr:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        /* ==================== BADGES ==================== */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .badge-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .badge-danger {
+            background-color: var(--error-color);
+            color: white;
+        }
+
+        /* ==================== NOTIFICATION TOAST ==================== */
+        .toast {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background-color: var(--card-bg);
+            border-left: 4px solid var(--success-color);
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px var(--shadow);
+            z-index: 3000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.error {
+            border-left-color: var(--error-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ==================== RESPONSIVE DESIGN ==================== */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .navbar {
+                padding: 1rem;
+            }
+
+            .navbar-menu {
+                gap: 0.5rem;
+            }
+
+            .grid-3, .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        /* ==================== UTILITY CLASSES ==================== */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+
+        .flex {
+            display: flex;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
+        .gap-3 { gap: 1.5rem; }
+    </style>
+</head>
+<body>
+    <!-- ==================== NAVIGATION BAR ==================== -->
+    <nav class="navbar" id="navbar">
+        <a href="#" class="navbar-brand" onclick="showHomePage(); return false;">🎫 GLAU EVENT</a>
+        <div class="navbar-menu">
+            <div id="authLinks"></div>
+            <button class="theme-toggle-btn" onclick="toggleTheme(); return false;" title="Toggle Theme">
+                <span id="themeIcon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ==================== MAIN CONTENT CONTAINER ==================== -->
+    <div id="app"></div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // ==================== CONFIGURATION ====================
+       const API_BASE_URL = 'http://localhost:5000/api';
+    
+        // ==================== APPLICATION DATA (DEMO MODE) ====================
+        const appData = {
+            currentUser: null,
+            theme: 'light',
+            events: [
+                {
+                    id: 'EVT001',
+                    name: 'TechConf 2025',
+                    description: 'Join us for the biggest technology conference of the year featuring industry leaders and innovative workshops.',
+                    category: 'Conference',
+                    date: '2025-12-15',
+                    time: '09:00 AM',
+                    location: 'Mumbai Convention Center',
+                    price: 1500,
+                    total_tickets: 500,
+                    sold_tickets: 245,
+                    image_url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
+                    status: 'Active'
+                },
+                {
+                    id: 'EVT002',
+                    name: 'Mumbai Music Festival',
+                    description: 'Experience the magic of live music with performances from top artists across multiple genres.',
+                    category: 'Concert',
+                    date: '2025-12-20',
+                    time: '06:00 PM',
+                    location: 'NSCI Dome, Mumbai',
+                    price: 2500,
+                    total_tickets: 1000,
+                    sold_tickets: 678,
+                    image_url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80',
+                    status: 'Active'
+                },
+                {
+                    id: 'EVT003',
+                    name: 'IPL Cricket Match',
+                    description: 'Witness the thrilling action as two powerhouse teams battle it out in this high-stakes IPL match.',
+                    category: 'Sports',
+                    date: '2025-12-25',
+                    time: '03:30 PM',
+                    location: 'Wankhede Stadium, Mumbai',
+                    price: 800,
+                    total_tickets: 2000,
+                    sold_tickets: 1856,
+                    image_url: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800&q=80',
+                    status: 'Active'
+                },
+                {
+                    id: 'EVT004',
+                    name: 'Web Development Workshop',
+                    description: 'Learn modern web development from scratch with hands-on projects and expert guidance.',
+                    category: 'Workshop',
+                    date: '2025-12-10',
+                    time: '10:00 AM',
+                    location: 'GLAU Campus, Greater Noida',
+                    price: 999,
+                    total_tickets: 150,
+                    sold_tickets: 89,
+                    image_url: 'https://images.unsplash.com/photo-1591115765373-5207764f72e7?w=800&q=80',
+                    status: 'Active'
+                }
+            ],
+            clients: [
+                {
+                    id: 'CLT001',
+                    name: 'Rajesh Kumar',
+                    email: 'client@glau.com',
+                    password: 'client123',
+                    phone: '9876543210',
+                    city: 'Mumbai',
+                    role: 'client'
+                }
+            ],
+            admins: [
+                {
+                    id: 'ADM001',
+                    email: 'admin@glau.com',
+                    password: 'admin123',
+                    name: 'Admin User',
+                    role: 'admin'
+                }
+            ],
+            purchases: []
+        };
+
+        // ==================== THEME MANAGEMENT ====================
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            appData.theme = savedTheme;
+            updateThemeIcon(savedTheme);
+        }
+
+           // Fetch events from backend API and populate the UI
+           async function fetchEventsFromAPI() {
+               try {
+                   const res = await fetch(`${API_BASE_URL}/events`);
+                   if (!res.ok) throw new Error('Failed to fetch events');
+                   const data = await res.json();
+                   console.log('API response:', data);
+
+                   // Normalize different backend response shapes
+                   let events = [];
+                   if (Array.isArray(data)) events = data;
+                   else if (data.data && Array.isArray(data.data)) events = data.data;
+                   else if (data.events && Array.isArray(data.events)) events = data.events;
+
+                   if (events.length) {
+                       appData.events = events.map(e => ({
+                           id: e._id || e.id || ('EVT' + Math.random().toString(36).slice(2,8)),
+                           name: e.name || e.title || 'Untitled Event',
+                           description: e.description || e.desc || '',
+                           category: e.category || e.type || 'General',
+                           date: e.date || e.eventDate || new Date().toISOString().split('T')[0],
+                           time: e.time || 'TBD',
+                           location: e.location || e.venue || 'TBD',
+                           price: e.price || e.amount || 0,
+                           total_tickets: e.total_tickets || e.totalTickets || e.capacity || 0,
+                           sold_tickets: e.sold_tickets || e.soldTickets || 0,
+                           image_url: e.image_url || e.image || e.cover || 'https://via.placeholder.com/800x200',
+                           status: e.status || 'Active'
+                       }));
+                       console.log('Normalized events:', appData.events);
+                   }
+
+                   // Re-render the currently visible view
+                   const savedUser = localStorage.getItem('currentUser');
+                   if (savedUser) {
+                       const user = JSON.parse(savedUser);
+                       if (user.role === 'admin') showAdminDashboard();
+                       else showClientDashboard();
+                   } else {
+                       showHomePage();
+                   }
+               } catch (err) {
+                   console.error('Error fetching events from API', err);
+                   // Show homepage with fallback events on error
+                   showHomePage();
+               }
+           }
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            appData.theme = newTheme;
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const themeIcon = document.getElementById('themeIcon');
+            if (themeIcon) {
+                themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+                themeIcon.setAttribute('title', theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+            }
+        }
+
+        // ==================== AUTHENTICATION ====================
+        function updateAuthLinks() {
+            const authLinksContainer = document.getElementById('authLinks');
+            
+            if (appData.currentUser) {
+                authLinksContainer.innerHTML = `
+                    <span style="color: var(--text-secondary);">Welcome, ${appData.currentUser.name}</span>
+                    <a href="#" class="nav-link" onclick="logout()">Logout</a>
+                `;
+            } else {
+                authLinksContainer.innerHTML = `
+                    <a href="#" class="nav-link" onclick="showLoginPage()">Login</a>
+                    <a href="#" class="nav-link" onclick="showRegisterPage()">Register</a>
+                `;
+            }
+        }
+
+        function showLoginPage() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="auth-page">
+                    <div class="auth-card">
+                        <h2>Login to GLAU EVENT</h2>
+                        <form id="loginForm">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" class="form-control" id="loginEmail" required 
+                                       placeholder="Enter your email" value="client@glau.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" class="form-control" id="loginPassword" required 
+                                       placeholder="Enter your password" value="client123">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="rememberMe"> Remember Me
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                        </form>
+                        <div class="text-center mt-3">
+                            <p>Don't have an account? <a href="#" onclick="showRegisterPage(); return false;">Register</a></p>
+                            <p><a href="#" onclick="showForgotPassword(); return false;">Forgot Password?</a></p>
+                        </div>
+                        <div class="text-center mt-2">
+                            <small style="color: var(--text-secondary);">
+                                Demo Credentials:<br>
+                                Client: client@glau.com / client123<br>
+                                Admin: admin@glau.com / admin123
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            `;
+            // Attach event listener after rendering
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            // Check in clients
+            const client = appData.clients.find(c => c.email === email && c.password === password);
+            if (client) {
+                appData.currentUser = { ...client, rememberMe };
+                localStorage.setItem('currentUser', JSON.stringify(appData.currentUser));
+                showNotification('Login successful!', 'success');
+                showClientDashboard();
+                updateAuthLinks();
+                return;
+            }
+            
+            // Check in admins
+            const admin = appData.admins.find(a => a.email === email && a.password === password);
+            if (admin) {
+                appData.currentUser = { ...admin, rememberMe };
+                localStorage.setItem('currentUser', JSON.stringify(appData.currentUser));
+                showNotification('Admin login successful!', 'success');
+                showAdminDashboard();
+                updateAuthLinks();
+                return;
+            }
+            
+            showNotification('Invalid credentials', 'error');
+        }
+
+        function showRegisterPage() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="auth-page">
+                    <div class="auth-card">
+                        <h2>Register</h2>
+                        <form id="registerForm">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" class="form-control" id="regName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" class="form-control" id="regEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="tel" class="form-control" id="regPhone" required pattern="[6-9][0-9]{9}">
+                            </div>
+                            <div class="form-group">
+                                <label>City</label>
+                                <input type="text" class="form-control" id="regCity" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" class="form-control" id="regPassword" required minlength="8">
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+                        </form>
+                        <div class="text-center mt-3">
+                            <p>Already have an account? <a href="#" onclick="showLoginPage(); return false;">Login</a></p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            // Attach event listener after rendering
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const newClient = {
+                id: 'CLT' + String(appData.clients.length + 1).padStart(3, '0'),
+                name: document.getElementById('regName').value,
+                email: document.getElementById('regEmail').value,
+                phone: document.getElementById('regPhone').value,
+                city: document.getElementById('regCity').value,
+                password: document.getElementById('regPassword').value,
+                role: 'client'
+            };
+            
+            // Check if email exists
+            if (appData.clients.some(c => c.email === newClient.email)) {
+                showNotification('Email already registered', 'error');
+                return;
+            }
+            
+            appData.clients.push(newClient);
+            showNotification('Registration successful! Please login.', 'success');
+            showLoginPage();
+        }
+
+        function logout() {
+            appData.currentUser = null;
+            localStorage.removeItem('currentUser');
+            showNotification('Logged out successfully', 'success');
+            showHomePage();
+            updateAuthLinks();
+        }
+
+        // ==================== TICKET BOOKING ====================
+        function buyTicket(eventId) {
+            const event = appData.events.find(e => e.id === eventId);
+            if (!event) return;
+
+            if (!appData.currentUser) {
+                showNotification('Please login to buy tickets', 'error');
+                showLoginPage();
+                return;
+            }
+
+            const availableTickets = event.total_tickets - event.sold_tickets;
+            if (availableTickets <= 0) {
+                showNotification('This event is sold out', 'error');
+                return;
+            }
+
+            // Show booking modal
+            const modal = createModal(
+                `Book Tickets for ${event.name}`,
+                `
+                    <p><strong>Event:</strong> ${event.name}</p>
+                    <p><strong>Date:</strong> ${event.date}</p>
+                    <p><strong>Location:</strong> ${event.location}</p>
+                    <p><strong>Price per ticket:</strong> ₹${event.price}</p>
+                    <p><strong>Available tickets:</strong> ${availableTickets}</p>
+                    <div class="form-group" style="margin-top: 1.5rem;">
+                        <label>Number of Tickets:</label>
+                        <input type="number" id="ticketCount" class="form-control" min="1" max="${availableTickets}" value="1">
+                    </div>
+                    <p id="totalPrice" style="font-size: 1.25rem; font-weight: bold; color: var(--primary-color); margin-top: 1rem;">
+                        Total: ₹${event.price}
+                    </p>
+                `,
+                `
+                    <button class="btn btn-primary" onclick="confirmBooking('${eventId}'); return false;">Confirm Booking</button>
+                    <button class="btn btn-secondary" onclick="closeAllModals(); return false;">Cancel</button>
+                `
+            );
+
+            document.body.appendChild(modal);
+            modal.classList.add('active');
+
+            // Update price on input change
+            const ticketInput = document.getElementById('ticketCount');
+            if (ticketInput) {
+                ticketInput.addEventListener('change', (e) => {
+                    const qty = parseInt(e.target.value) || 1;
+                    const total = event.price * qty;
+                    document.getElementById('totalPrice').textContent = `Total: ₹${total}`;
+                });
+            }
+        }
+
+        function confirmBooking(eventId) {
+            const event = appData.events.find(e => e.id === eventId);
+            if (!event) return;
+
+            const ticketCountInput = document.getElementById('ticketCount');
+            const ticketCount = parseInt(ticketCountInput?.value) || 1;
+            const totalAmount = event.price * ticketCount;
+
+            // Show payment gateway instead of directly confirming
+            showPaymentGateway(eventId, ticketCount, totalAmount);
+        }
+
+        // ==================== PAGE RENDERING ====================
+        function showHomePage() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="container">
+                    <div class="text-center mb-3">
+                        <h1 style="font-size: 3rem; margin-bottom: 1rem;">Welcome to GLAU EVENT</h1>
+                        <p style="font-size: 1.25rem; color: var(--text-secondary);">
+                            Discover amazing events and book your tickets now!
+                        </p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h2>Featured Events</h2>
+                    </div>
+                    
+                    <div class="grid grid-3" id="eventsGrid"></div>
+                </div>
+            `;
+            
+            renderEvents(appData.events);
+        }
+
+        function renderEvents(events) {
+            const grid = document.getElementById('eventsGrid');
+            if (!grid) return;
+            
+            if (!events || events.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">No events available</p>';
+                return;
+            }
+            
+            grid.innerHTML = events.map(event => {
+                // Parse date safely - event.date can be string like "2025-12-15" or Date object
+                let dateStr = event.date;
+                if (event.date instanceof Date) {
+                    dateStr = event.date.toLocaleDateString();
+                } else if (typeof event.date === 'string') {
+                    // If it's ISO date string like "2025-12-15", parse it directly
+                    dateStr = new Date(event.date + 'T00:00:00').toLocaleDateString();
+                } else {
+                    dateStr = 'TBD';
+                }
+                
+                return `
+                <div class="event-card" onclick="showEventDetails('${event.id}')">
+                    <img src="${event.image_url}" alt="${event.name}" class="event-image">
+                    <div class="event-details">
+                        <span class="event-category">${event.category}</span>
+                        <h3 class="event-title">${event.name}</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                            📍 ${event.location}<br>
+                            📅 ${dateStr}<br>
+                            🎫 ₹${event.price} • ${event.total_tickets - event.sold_tickets} tickets left
+                        </p>
+                        <button class="btn btn-primary" onclick="event.stopPropagation(); showEventDetails('${event.id}')">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        function showEventDetails(eventId) {
+            const event = appData.events.find(e => e.id === eventId);
+            if (!event) return;
+            
+            // Parse date safely
+            let dateStr = event.date;
+            if (event.date instanceof Date) {
+                dateStr = event.date.toLocaleDateString();
+            } else if (typeof event.date === 'string') {
+                dateStr = new Date(event.date + 'T00:00:00').toLocaleDateString();
+            } else {
+                dateStr = 'TBD';
+            }
+            
+            const modal = createModal(
+                event.name,
+                `
+                    <img src="${event.image_url}" alt="${event.name}" style="width: 100%; border-radius: 8px; margin-bottom: 1rem;">
+                    <span class="event-category">${event.category}</span>
+                    <p style="margin-top: 1rem;">${event.description}</p>
+                    <div style="margin-top: 1.5rem;">
+                        <p><strong>📅 Date:</strong> ${dateStr}</p>
+                        <p><strong>⏰ Time:</strong> ${event.time}</p>
+                        <p><strong>📍 Location:</strong> ${event.location}</p>
+                        <p><strong>💰 Price:</strong> ₹${event.price}</p>
+                        <p><strong>🎫 Available Tickets:</strong> ${event.total_tickets - event.sold_tickets} / ${event.total_tickets}</p>
+                    </div>
+                `,
+                appData.currentUser ? 
+                    `<button class="btn btn-primary" onclick="buyTicket('${eventId}')">Buy Tickets</button>` :
+                    `<p style="color: var(--error-color);">Please login to buy tickets</p>
+                     <button class="btn btn-primary" onclick="closeAllModals(); showLoginPage();">Login</button>`
+            );
+            
+            document.body.appendChild(modal);
+            modal.classList.add('active');
+        }
+
+        function showClientDashboard() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="dashboard">
+                    <aside class="sidebar">
+                        <ul class="sidebar-menu">
+                            <li><a href="#" class="sidebar-link active" onclick="showClientHome(); return false;">🏠 Home</a></li>
+                            <li><a href="#" class="sidebar-link" onclick="showMyPurchases(); return false;">🎫 My Tickets</a></li>
+                            <li><a href="#" class="sidebar-link" onclick="showClientProfile(); return false;">👤 Profile</a></li>
+                        </ul>
+                    </aside>
+                    <main class="main-content" id="dashboardContent">
+                        <h1>Browse Events</h1>
+                        <div class="grid grid-3" id="eventsGrid"></div>
+                    </main>
+                </div>
+            `;
+            
+            renderEvents(appData.events);
+        }
+
+        function showAdminDashboard() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="dashboard">
+                    <aside class="sidebar">
+                        <ul class="sidebar-menu">
+                            <li><a href="#" class="sidebar-link active" onclick="showAdminHome(); return false;">📊 Dashboard</a></li>
+                            <li><a href="#" class="sidebar-link" onclick="showAdminEvents(); return false;">🎫 Events</a></li>
+                            <li><a href="#" class="sidebar-link" onclick="showAdminClients(); return false;">👥 Clients</a></li>
+                        </ul>
+                    </aside>
+                    <main class="main-content" id="dashboardContent"></main>
+                </div>
+            `;
+            
+            showAdminHome();
+        }
+
+        function showAdminHome() {
+            const content = document.getElementById('dashboardContent');
+            const totalRevenue = appData.purchases.reduce((sum, p) => sum + p.total_amount, 0);
+            const totalTickets = appData.purchases.reduce((sum, p) => sum + p.quantity, 0);
+            const ticketsSoldFromEvents = appData.events.reduce((sum, e) => sum + (e.sold_tickets || 0), 0);
+            const seatsLeft = appData.events.reduce((sum, e) => sum + ((e.total_tickets || 0) - (e.sold_tickets || 0)), 0);
+            
+            content.innerHTML = `
+                <h1>Admin Dashboard</h1>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${appData.events.length}</div>
+                        <div class="stat-label">Total Events</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">₹${totalRevenue.toLocaleString()}</div>
+                        <div class="stat-label">Total Revenue</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${ticketsSoldFromEvents}</div>
+                        <div class="stat-label">Tickets Sold (by events)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${seatsLeft}</div>
+                        <div class="stat-label">Seats Left</div>
+                    </div>
+                </div>
+                
+                <h2>Recent Events</h2>
+                <div class="grid grid-3" id="adminEventsList"></div>
+            `;
+            
+            const grid = document.getElementById('adminEventsList');
+            grid.innerHTML = appData.events.slice(0, 3).map(event => `
+                <div class="card">
+                    <h3>${event.name}</h3>
+                    <p>${event.category} • ${new Date(event.date).toLocaleDateString()}</p>
+                    <p><strong>Sold:</strong> ${event.sold_tickets} / ${event.total_tickets}</p>
+                </div>
+            `).join('');
+        }
+
+        function showAdminEvents() {
+            const content = document.getElementById('dashboardContent');
+            content.innerHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <h1>Event Management</h1>
+                    <button class="btn btn-primary" onclick="showAddEventModal()">+ Add New Event</button>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Tickets</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventsTableBody"></tbody>
+                    </table>
+                </div>
+            `;
+            
+            renderEventsTable();
+        }
+
+        function renderEventsTable() {
+            const tbody = document.getElementById('eventsTableBody');
+            tbody.innerHTML = appData.events.map(event => `
+                <tr>
+                    <td>${event.name}</td>
+                    <td>${new Date(event.date).toLocaleDateString()}</td>
+                    <td><span class="badge badge-success">${event.category}</span></td>
+                    <td>₹${event.price}</td>
+                    <td>${event.sold_tickets} / ${event.total_tickets}</td>
+                    <td><span class="badge badge-success">${event.status}</span></td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="editEvent('${event.id}')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteEvent('${event.id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ==================== ADMIN CLIENTS MANAGEMENT ====================
+        function showAdminClients() {
+            const content = document.getElementById('dashboardContent');
+            content.innerHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <h1>Clients</h1>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>City</th>
+                                <th>Role</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientsTableBody"></tbody>
+                    </table>
+                </div>
+            `;
+
+            renderClientsTable();
+        }
+
+        function renderClientsTable() {
+            const tbody = document.getElementById('clientsTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = appData.clients.map(client => `
+                <tr>
+                    <td>${client.name || '-'}</td>
+                    <td>${client.email || '-'}</td>
+                    <td>${client.phone || '-'}</td>
+                    <td>${client.city || '-'}</td>
+                    <td>${client.role || 'client'}</td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="alert('View profile coming soon for ${client.email}')">View</button>
+                        <button class="btn btn-danger" onclick="deleteClient('${client.id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function deleteClient(id) {
+            if (!confirm('Are you sure you want to remove this client?')) return;
+            const idx = appData.clients.findIndex(c => c.id === id);
+            if (idx === -1) return showNotification('Client not found', 'error');
+
+            // Prevent deleting current admin by mistake
+            if (appData.currentUser && appData.currentUser.id === id) {
+                return showNotification('Cannot delete currently logged in user', 'error');
+            }
+
+            appData.clients.splice(idx, 1);
+            showNotification('Client removed locally', 'success');
+
+            try {
+                await fetch(`${API_BASE_URL}/clients/${id}`, { method: 'DELETE' });
+            } catch (err) {
+                console.warn('Backend client delete failed (likely unauthenticated).', err);
+            }
+
+            if (document.getElementById('clientsTableBody')) renderClientsTable();
+        }
+
+        // ==================== ADMIN EVENT MANAGEMENT ====================
+        function showAddEventModal() {
+            const modal = createModal('Add New Event', `
+                <form id="adminEventForm">
+                    <div class="form-group">
+                        <label>Event Name</label>
+                        <input type="text" id="evt_name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date (YYYY-MM-DD)</label>
+                        <input type="date" id="evt_date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Time</label>
+                        <input type="text" id="evt_time" class="form-control" placeholder="09:00 AM">
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="evt_location" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" id="evt_category" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (INR)</label>
+                        <input type="number" id="evt_price" class="form-control" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Tickets</label>
+                        <input type="number" id="evt_total_tickets" class="form-control" min="0" value="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="text" id="evt_image" class="form-control" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="evt_description" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            `, `
+                <button class="btn btn-primary" onclick="saveEvent(); return false;">Save Event</button>
+                <button class="btn btn-secondary" onclick="closeAllModals(); return false;">Cancel</button>
+            `);
+
+            document.body.appendChild(modal);
+            modal.classList.add('active');
+        }
+
+        function editEvent(id) {
+            const event = appData.events.find(e => e.id === id);
+            if (!event) return showNotification('Event not found', 'error');
+
+            const modal = createModal('Edit Event - ' + event.name, `
+                <form id="adminEventForm">
+                    <div class="form-group">
+                        <label>Event Name</label>
+                        <input type="text" id="evt_name" class="form-control" required value="${event.name}">
+                    </div>
+                    <div class="form-group">
+                        <label>Date (YYYY-MM-DD)</label>
+                        <input type="date" id="evt_date" class="form-control" required value="${event.date}">
+                    </div>
+                    <div class="form-group">
+                        <label>Time</label>
+                        <input type="text" id="evt_time" class="form-control" value="${event.time || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="evt_location" class="form-control" value="${event.location || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" id="evt_category" class="form-control" value="${event.category || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (INR)</label>
+                        <input type="number" id="evt_price" class="form-control" min="0" value="${event.price || 0}">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Tickets</label>
+                        <input type="number" id="evt_total_tickets" class="form-control" min="0" value="${event.total_tickets || 0}">
+                    </div>
+                    <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="text" id="evt_image" class="form-control" value="${event.image_url || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="evt_description" class="form-control" rows="3">${event.description || ''}</textarea>
+                    </div>
+                </form>
+            `, `
+                <button class="btn btn-primary" onclick="saveEvent('${id}'); return false;">Update Event</button>
+                <button class="btn btn-secondary" onclick="closeAllModals(); return false;">Cancel</button>
+            `);
+
+            document.body.appendChild(modal);
+            modal.classList.add('active');
+        }
+
+        async function saveEvent(id) {
+            const name = document.getElementById('evt_name').value;
+            const date = document.getElementById('evt_date').value;
+            const time = document.getElementById('evt_time').value;
+            const location = document.getElementById('evt_location').value;
+            const category = document.getElementById('evt_category').value;
+            const price = parseFloat(document.getElementById('evt_price').value) || 0;
+            const total_tickets = parseInt(document.getElementById('evt_total_tickets').value) || 0;
+            const image_url = document.getElementById('evt_image').value || 'https://via.placeholder.com/800x200';
+            const description = document.getElementById('evt_description').value || '';
+
+            if (!name || !date) return showNotification('Name and date are required', 'error');
+
+            if (id) {
+                // Update local data
+                const index = appData.events.findIndex(e => e.id === id);
+                if (index === -1) return showNotification('Event not found', 'error');
+                appData.events[index] = {
+                    ...appData.events[index],
+                    name, date, time, location, category, price, total_tickets, image_url, description
+                };
+                showNotification('Event updated locally', 'success');
+                closeAllModals();
+            } else {
+                const newEvent = {
+                    id: 'EVT' + String(appData.events.length + 1).padStart(3, '0'),
+                    name, date, time, location, category, price, total_tickets, sold_tickets: 0, image_url, description, status: 'Active'
+                };
+                appData.events.push(newEvent);
+                showNotification('Event added locally', 'success');
+                closeAllModals();
+            }
+
+            // Try to sync with backend (if admin auth available)
+            try {
+                if (id) {
+                    await fetch(`${API_BASE_URL}/${id}`, { method: 'PUT', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(appData.events.find(e=>e.id===id)) });
+                } else {
+                    await fetch(`${API_BASE_URL}`, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(appData.events[appData.events.length-1]) });
+                }
+            } catch (err) {
+                // ignore network/auth errors; local change already applied
+                console.warn('Backend sync failed (likely unauthenticated).', err);
+            }
+
+            // Refresh table and admin dashboard
+            if (document.getElementById('eventsTableBody')) renderEventsTable();
+            if (document.getElementById('adminEventsList')) showAdminHome();
+        }
+
+        async function deleteEvent(id) {
+            if (!confirm('Are you sure you want to delete this event?')) return;
+            const idx = appData.events.findIndex(e => e.id === id);
+            if (idx === -1) return showNotification('Event not found', 'error');
+            appData.events.splice(idx,1);
+            showNotification('Event removed locally', 'success');
+
+            try {
+                await fetch(`${API_BASE_URL}/${id}`, { method: 'DELETE' });
+            } catch (err) {
+                console.warn('Backend delete failed (likely unauthenticated).', err);
+            }
+
+            if (document.getElementById('eventsTableBody')) renderEventsTable();
+            if (document.getElementById('adminEventsList')) showAdminHome();
+        }
+
+        // ==================== CLIENT DASHBOARD FUNCTIONS ====================
+        function showClientHome() {
+            const content = document.getElementById('dashboardContent');
+            content.innerHTML = `
+                <h1>Welcome, ${appData.currentUser.name}!</h1>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Explore and book amazing events</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${appData.events.length}</div>
+                        <div class="stat-label">Available Events</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${appData.purchases.filter(p => p.userId === appData.currentUser.id).length}</div>
+                        <div class="stat-label">My Bookings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${appData.purchases.filter(p => p.userId === appData.currentUser.id).reduce((sum, p) => sum + p.quantity, 0)}</div>
+                        <div class="stat-label">Total Tickets</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">₹${appData.purchases.filter(p => p.userId === appData.currentUser.id).reduce((sum, p) => sum + p.total_amount, 0).toLocaleString()}</div>
+                        <div class="stat-label">Total Spent</div>
+                    </div>
+                </div>
+                
+                <h2 style="margin-top: 2rem; margin-bottom: 1rem;">Featured Events</h2>
+                <div class="grid grid-3" id="eventsGrid"></div>
+            `;
+            
+            renderEvents(appData.events);
+        }
+
+        function showMyPurchases() {
+            const content = document.getElementById('dashboardContent');
+            const userPurchases = appData.purchases.filter(p => p.userId === appData.currentUser.id);
+            
+            if (userPurchases.length === 0) {
+                content.innerHTML = `
+                    <h1>My Tickets</h1>
+                    <div class="card" style="text-align: center; padding: 3rem;">
+                        <p style="color: var(--text-secondary); font-size: 1.1rem;">You haven't booked any tickets yet</p>
+                        <button class="btn btn-primary mt-3" onclick="showClientHome()">Browse Events</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            content.innerHTML = `
+                <h1>My Tickets</h1>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Event</th>
+                                <th>Date</th>
+                                <th>Quantity</th>
+                                <th>Total Amount</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${userPurchases.map(purchase => {
+                                const event = appData.events.find(e => e.id === purchase.eventId);
+                                const dateStr = event ? new Date(event.date).toLocaleDateString() : 'N/A';
+                                return `
+                                    <tr>
+                                        <td>${purchase.id}</td>
+                                        <td>${event?.name || 'Event Deleted'}</td>
+                                        <td>${dateStr}</td>
+                                        <td>${purchase.quantity}</td>
+                                        <td>₹${purchase.total_amount.toLocaleString()}</td>
+                                        <td><span class="badge badge-success">${purchase.status}</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary" onclick="downloadTicketPDF('${purchase.id}')">Download PDF</button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function showClientProfile() {
+            const content = document.getElementById('dashboardContent');
+            content.innerHTML = `
+                <h1>My Profile</h1>
+                <div class="card" style="max-width: 600px;">
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="margin-bottom: 1rem;">Personal Information</h3>
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" class="form-control" value="${appData.currentUser.name}" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="form-control" value="${appData.currentUser.email}" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" class="form-control" value="${appData.currentUser.phone || 'Not provided'}" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" class="form-control" value="${appData.currentUser.city || 'Not provided'}" disabled>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="margin-bottom: 1rem;">Booking Statistics</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="card">
+                                <p style="color: var(--text-secondary);">Total Bookings</p>
+                                <p style="font-size: 1.5rem; font-weight: bold;">${appData.purchases.filter(p => p.userId === appData.currentUser.id).length}</p>
+                            </div>
+                            <div class="card">
+                                <p style="color: var(--text-secondary);">Total Spent</p>
+                                <p style="font-size: 1.5rem; font-weight: bold;">₹${appData.purchases.filter(p => p.userId === appData.currentUser.id).reduce((sum, p) => sum + p.total_amount, 0).toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-secondary" onclick="editProfile()">Edit Profile</button>
+                </div>
+            `;
+        }
+
+        function editProfile() {
+            showNotification('Profile editing coming soon!', 'success');
+        }
+
+        // ==================== PAYMENT GATEWAY ====================
+        function showPaymentGateway(eventId, ticketCount, totalAmount) {
+            const modal = createModal(
+                '💳 Complete Payment',
+                `
+                    <div style="max-width: 500px; margin: 0 auto;">
+                        <div class="card" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)); color: white; margin-bottom: 1.5rem;">
+                            <p style="font-size: 0.9rem; opacity: 0.9;">Order Summary</p>
+                            <p style="font-size: 1.5rem; font-weight: bold;">₹${totalAmount.toLocaleString()}</p>
+                            <p style="font-size: 0.9rem; opacity: 0.9;">${ticketCount} ticket(s)</p>
+                        </div>
+
+                        <form id="paymentForm" style="margin-bottom: 1.5rem;">
+                            <div class="form-group">
+                                <label>Cardholder Name</label>
+                                <input type="text" class="form-control" id="cardName" placeholder="John Doe" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Card Number</label>
+                                <input type="text" class="form-control" id="cardNumber" placeholder="4532 1488 0343 6467" maxlength="19" required>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label>Expiry (MM/YY)</label>
+                                    <input type="text" class="form-control" id="cardExpiry" placeholder="12/28" maxlength="5" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>CVV</label>
+                                    <input type="text" class="form-control" id="cardCVV" placeholder="123" maxlength="3" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="saveCard"> Save this card for future purchases
+                                </label>
+                            </div>
+
+                            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+                                <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                                    ✓ SSL Encrypted • ✓ PCI Compliant • ✓ Secure Payment
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                `,
+                `
+                    <button class="btn btn-primary" onclick="processPayment('${eventId}', ${ticketCount}, ${totalAmount}); return false;">
+                        Pay ₹${totalAmount.toLocaleString()}
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeAllModals(); return false;">Cancel</button>
+                `
+            );
+
+            document.body.appendChild(modal);
+            modal.classList.add('active');
+
+            // Format card number with spaces
+            const cardInput = document.getElementById('cardNumber');
+            if (cardInput) {
+                cardInput.addEventListener('input', (e) => {
+                    e.target.value = e.target.value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
+                });
+            }
+
+            // Format expiry
+            const expiryInput = document.getElementById('cardExpiry');
+            if (expiryInput) {
+                expiryInput.addEventListener('input', (e) => {
+                    if (e.target.value.length === 2 && !e.target.value.includes('/')) {
+                        e.target.value += '/';
+                    }
+                });
+            }
+        }
+
+        function processPayment(eventId, ticketCount, totalAmount) {
+            const cardName = document.getElementById('cardName').value;
+            const cardNumber = document.getElementById('cardNumber').value;
+            const cardExpiry = document.getElementById('cardExpiry').value;
+            const cardCVV = document.getElementById('cardCVV').value;
+
+            // Validation
+            if (!cardName || !cardNumber || !cardExpiry || !cardCVV) {
+                showNotification('Please fill all payment details', 'error');
+                return;
+            }
+
+            if (cardNumber.replace(/\s/g, '').length !== 16) {
+                showNotification('Invalid card number', 'error');
+                return;
+            }
+
+            if (cardCVV.length !== 3) {
+                showNotification('Invalid CVV', 'error');
+                return;
+            }
+
+            // Show processing
+            showNotification('Processing payment...', 'success');
+
+            // Simulate payment processing
+            setTimeout(() => {
+                completeBooking(eventId, ticketCount, totalAmount);
+            }, 2000);
+        }
+
+        function completeBooking(eventId, ticketCount, totalAmount) {
+            const event = appData.events.find(e => e.id === eventId);
+            if (!event) return;
+
+            // Create purchase record with payment details
+            const purchase = {
+                id: 'PUR' + String(appData.purchases.length + 1).padStart(3, '0'),
+                userId: appData.currentUser.id,
+                eventId: eventId,
+                quantity: ticketCount,
+                total_amount: totalAmount,
+                purchaseDate: new Date().toISOString(),
+                status: 'Confirmed',
+                transactionId: 'TXN' + Date.now(),
+                paymentMethod: 'Credit Card'
+            };
+
+            appData.purchases.push(purchase);
+            event.sold_tickets += ticketCount;
+
+            closeAllModals();
+            showNotification(`Payment successful! ₹${totalAmount} charged to your card.`, 'success');
+
+            setTimeout(() => {
+                showNotification(`Tickets booked! Your booking ID: ${purchase.id}`, 'success');
+                showClientDashboard();
+            }, 1500);
+        }
+
+        // ==================== PDF TICKET GENERATION ====================
+        function downloadTicketPDF(purchaseId) {
+            const purchase = appData.purchases.find(p => p.id === purchaseId);
+            const event = appData.events.find(e => e.id === purchase.eventId);
+
+            if (!purchase || !event) return;
+
+            try {
+                const ticketHTML = `
+                    <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+                        <!-- Header -->
+                        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #0891b2; padding-bottom: 20px;">
+                            <h1 style="color: #0891b2; margin: 0; font-size: 2.5em;">🎫 GLAU EVENT</h1>
+                            <p style="color: #666; margin: 5px 0;">Official Ticket Confirmation</p>
+                        </div>
+
+                        <!-- Main Content -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                            <!-- Left Side - Event Details -->
+                            <div>
+                                <h2 style="color: #1f2937; margin-top: 0;">Ticket Details</h2>
+                                
+                                <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                    <p style="margin: 5px 0;"><strong>Booking ID:</strong> ${purchase.id}</p>
+                                    <p style="margin: 5px 0;"><strong>Transaction ID:</strong> ${purchase.transactionId || 'TXN' + purchase.id}</p>
+                                    <p style="margin: 5px 0;"><strong>Date of Purchase:</strong> ${new Date(purchase.purchaseDate).toLocaleDateString('en-IN', {year: 'numeric', month: 'long', day: 'numeric'})}</p>
+                                </div>
+
+                                <h3 style="color: #1f2937; margin-top: 20px;">Event Information</h3>
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr style="border-bottom: 1px solid #ddd;">
+                                        <td style="padding: 10px 0; font-weight: bold; color: #666;">Event Name:</td>
+                                        <td style="padding: 10px 0; color: #1f2937;">${event.name}</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd;">
+                                        <td style="padding: 10px 0; font-weight: bold; color: #666;">Category:</td>
+                                        <td style="padding: 10px 0; color: #1f2937;">${event.category}</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd;">
+                                        <td style="padding: 10px 0; font-weight: bold; color: #666;">Date:</td>
+                                        <td style="padding: 10px 0; color: #1f2937;">${new Date(event.date).toLocaleDateString('en-IN', {year: 'numeric', month: 'long', day: 'numeric'})}</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd;">
+                                        <td style="padding: 10px 0; font-weight: bold; color: #666;">Time:</td>
+                                        <td style="padding: 10px 0; color: #1f2937;">${event.time || 'TBD'}</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd;">
+                                        <td style="padding: 10px 0; font-weight: bold; color: #666;">Location:</td>
+                                        <td style="padding: 10px 0; color: #1f2937;">${event.location}</td>
+                                    </tr>
+                                </table>
+
+                                <h3 style="color: #1f2937; margin-top: 20px;">Attendee Information</h3>
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr style="border-bottom: 1px solid #ddd;">
+                                        <td style="padding: 10px 0; font-weight: bold; color: #666;">Name:</td>
+                                        <td style="padding: 10px 0; color: #1f2937;">${appData.currentUser.name}</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd;">
+                                        <td style="padding: 10px 0; font-weight: bold; color: #666;">Email:</td>
+                                        <td style="padding: 10px 0; color: #1f2937;">${appData.currentUser.email}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px 0; font-weight: bold; color: #666;">Phone:</td>
+                                        <td style="padding: 10px 0; color: #1f2937;">${appData.currentUser.phone || 'N/A'}</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Right Side - Amount -->
+                            <div style="text-align: center;">
+                                <div style="background: linear-gradient(135deg, #0891b2, #0e7490); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                                    <p style="margin: 0; font-size: 0.9em; opacity: 0.9;">Amount Paid</p>
+                                    <h2 style="margin: 10px 0 0 0; font-size: 2.5em;">₹${purchase.total_amount.toLocaleString('en-IN')}</h2>
+                                </div>
+
+                                <div style="background: #f5f5f5; padding: 15px; border-radius: 8px;">
+                                    <p style="margin: 5px 0;"><strong>Tickets:</strong> ${purchase.quantity}</p>
+                                    <p style="margin: 5px 0;"><strong>Price per Ticket:</strong> ₹${(purchase.total_amount / purchase.quantity).toLocaleString('en-IN')}</p>
+                                    <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #10b981; font-weight: bold;">${purchase.status}</span></p>
+                                    <p style="margin: 5px 0;"><strong>Payment Method:</strong> ${purchase.paymentMethod || 'Card'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Terms -->
+                        <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; border-left: 4px solid #0891b2; margin-top: 30px;">
+                            <h4 style="color: #1f2937; margin-top: 0;">Important Instructions</h4>
+                            <ul style="color: #666; line-height: 1.8;">
+                                <li>Please bring this ticket confirmation for entry</li>
+                                <li>Arrive 15 minutes before the event starts</li>
+                                <li>Tickets are non-transferable and non-refundable</li>
+                                <li>For any queries, contact: support@glau-event.com</li>
+                            </ul>
+                        </div>
+
+                        <!-- Footer -->
+                        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #999;">
+                            <p style="margin: 0; font-size: 0.9em;">GLAU EVENT © 2025 | All Rights Reserved</p>
+                            <p style="margin: 5px 0; font-size: 0.9em;">Thank you for your booking!</p>
+                        </div>
+                    </div>
+                `;
+
+                const element = document.createElement('div');
+                element.innerHTML = ticketHTML;
+                element.style.display = 'none';
+                document.body.appendChild(element);
+
+                // Check if html2pdf is available
+                if (typeof html2pdf !== 'undefined') {
+                    const options = {
+                        margin: 10,
+                        filename: `GLAU-EVENT-Ticket-${purchase.id}.pdf`,
+                        image: { type: 'image/png', quality: 0.98 },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                    };
+
+                    html2pdf().set(options).from(element).save().then(() => {
+                        document.body.removeChild(element);
+                        showNotification('Ticket PDF downloaded successfully!', 'success');
+                    }).catch(() => {
+                        printTicket(element);
+                    });
+                } else {
+                    // Fallback to print
+                    printTicket(element);
+                }
+            } catch (err) {
+                console.error('Error generating PDF:', err);
+                showNotification('Error downloading ticket. Please try again.', 'error');
+            }
+        }
+
+        function printTicket(element) {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(element.innerHTML);
+            printWindow.document.close();
+            setTimeout(() => {
+                printWindow.print();
+                document.body.removeChild(element);
+                showNotification('Ticket ready for printing!', 'success');
+            }, 250);
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function createModal(title, bodyContent, footerContent = '') {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>${title}</h2>
+                        <button class="close-modal" onclick="this.closest('.modal').remove()">×</button>
+                    </div>
+                    <div class="modal-body">${bodyContent}</div>
+                    ${footerContent ? `<div class="modal-footer">${footerContent}</div>` : ''}
+                </div>
+            `;
+            return modal;
+        }
+
+        function closeAllModals() {
+            document.querySelectorAll('.modal').forEach(m => m.remove());
+        }
+
+        function showNotification(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTheme();
+            
+            // Check for saved user
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                try {
+                    appData.currentUser = JSON.parse(savedUser);
+                    if (appData.currentUser.role === 'admin') {
+                        showAdminDashboard();
+                    } else {
+                        showClientDashboard();
+                    }
+                } catch (e) {
+                    console.error('Error parsing saved user:', e);
+                    localStorage.removeItem('currentUser');
+                    showHomePage();
+                }
+            } else {
+                showHomePage();
+            }
+            
+            updateAuthLinks();
+            
+            // Fetch events from API on page load
+            setTimeout(() => {
+                fetchEventsFromAPI();
+            }, 500);
+        });
+
+        // Make functions globally available
+        window.toggleTheme = toggleTheme;
+        window.showLoginPage = showLoginPage;
+        window.showRegisterPage = showRegisterPage;
+        window.logout = logout;
+        window.showHomePage = showHomePage;
+        window.showEventDetails = showEventDetails;
+        window.showClientDashboard = showClientDashboard;
+        window.showClientHome = showClientHome;
+        window.showMyPurchases = showMyPurchases;
+        window.showClientProfile = showClientProfile;
+        window.downloadTicketPDF = downloadTicketPDF;
+        window.editProfile = editProfile;
+        window.showAdminDashboard = showAdminDashboard;
+        window.showAdminHome = showAdminHome;
+        window.showAdminEvents = showAdminEvents;
+        window.showAdminClients = showAdminClients;
+        window.showAddEventModal = showAddEventModal;
+        window.editEvent = editEvent;
+        window.deleteEvent = deleteEvent;
+        window.saveEvent = saveEvent;
+        window.closeAllModals = closeAllModals;
+        window.fetchEventsFromAPI = fetchEventsFromAPI;
+        window.buyTicket = buyTicket;
+        window.confirmBooking = confirmBooking;
+        window.showPaymentGateway = showPaymentGateway;
+        window.processPayment = processPayment;
+        window.completeBooking = completeBooking;
+    </script>
+    
+</body>
+</html>
